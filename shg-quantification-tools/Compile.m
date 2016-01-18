@@ -7,6 +7,7 @@ function Compile
     
     % Get version
     [~,ver] = system('git describe','-echo');
+    ver = ver(1:end-1);
     
     % Build App
     try

@@ -28,7 +28,7 @@ function Compile
         ext = '.app';
     end
    
-    new_file = ['SHG Quantification Tools ' ver];
+    new_file = ['SHG Quantification Tools ' ver ' ' computer('arch')];
 
     movefile(['build' filesep 'SHG_Quantification_Tools' ext], ['build' filesep new_file ext]);
     

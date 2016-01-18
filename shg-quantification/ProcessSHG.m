@@ -92,7 +92,6 @@ function ProcessSHG()
             g = gradient(y);
             xmi = find(g<0,1,'first');
 
-            %[~,xmi] = max(y);
             yy(:,i) = interp1(x,y,xx+xmi);
         end
         plot(xx,yy);

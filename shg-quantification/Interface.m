@@ -15,10 +15,11 @@ function Interface()
     %ax = axes('Parent', layout);
     %set(layout, 'Sizes', [200 -1]);
     
-    AddButton('Extract Images from Lif...', @ExtractFromLif);
-    AddButton('Process SHG from Lif...', @ProcessSHG); 
-    AddButton('Process Series of GLCM Images...', @ProcessGLCMstacks);
-    AddButton('Code TMA Images...', @CodeTMAImages);
+    AddButton('Process SHG from Lif', @ProcessSHG); 
+    AddButton('Extract images from Lif', @ExtractFromLif);
+    AddButton('Process series of GLCM Images', @ProcessGLCMstacks);
+    AddButton('Extract TMA images', @ExtractTMAImagesFromLif);
+    AddButton('Code TMA images', @CodeTMAImages);
     
     sizes = 50 * ones(1,length(blayout.Children));
     uiextras.Empty('Parent', blayout);

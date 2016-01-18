@@ -3,6 +3,8 @@ function Compile
     % Build GLCM MEX file
     mex glcm.cpp 'CXXFLAGS="$CXXFLAGS -O3"'
     
+    GetBioformats();
+    
     % Get version
     [~,ver] = system('git describe','-echo');
     

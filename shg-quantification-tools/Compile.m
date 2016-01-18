@@ -19,7 +19,7 @@ function Compile
     mcc('-m','Interface.m', ...
         '-a','bfmatlab', ...
         '-a','glcm.*', ...
-        '-C', '-v', '-m', '-d', 'build', '-o', 'SHG_Quantification_Tools');
+        '-v', '-m', '-d', 'build', '-o', 'SHG_Quantification_Tools');
         
     if ispc
         ext = '.exe';
@@ -34,7 +34,7 @@ function Compile
     if ismac
         mkdir(['build' filesep 'dist']);
         movefile(['build' filesep new_file ext], ['build' filesep 'dist' filesep new_file ext]);
-        cmd = ['hdiutil create "./build/' new_file '.dmg" -srcfolder ./build/dist/ -ov'];
+        cmd = ['hdiutil create "./build/' new_file '.dmg" -srcfolder ./build/dist/ -volname "' new_file '" -ov'];
         disp(cmd)
         system(cmd)
     end

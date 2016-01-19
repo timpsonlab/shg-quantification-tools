@@ -5,6 +5,13 @@ function Compile
     
     GetBioformats();
     
+    % Get GUI extras
+    if ~exist('uiextras.VBox','class')
+        websave('guilayout.zip','http://www.mathworks.com/matlabcentral/mlc-downloads/downloads/submissions/47982/versions/6/download/zip')
+        unzip('guilayout.zip');
+        addpath('layout');
+    end
+    
     % Get version
     [~,ver] = system('git describe','-echo');
     ver = ver(1:end-1);
@@ -20,7 +27,7 @@ function Compile
     mcc('-m','Interface.m', ...
         '-a','bfmatlab', ...
         '-a','glcm.*', ...
-        '-v', '-m', '-d', 'build', '-o', 'SHG_Quantification_Tools');
+        '-v', '-d', 'build', '-o', 'SHG_Quantification_Tools');
         
     if ispc
         ext = '.exe';

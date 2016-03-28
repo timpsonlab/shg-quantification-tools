@@ -10,6 +10,7 @@ function ExtractFromLif(file)
 
     data = bfopen([folder file]);
 
+    mkdir([folder 'Data']);
     
     n_im = size(data,1);
 

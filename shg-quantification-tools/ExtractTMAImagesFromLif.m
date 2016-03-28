@@ -12,6 +12,7 @@ function ExtractTMAImagesFromLif(file)
 
     data = bfopen([folder file]);
 
+    mkdir([folder filesep 'Data']);
     
     n_im = size(data,1);
 

@@ -8,11 +8,11 @@ function ProcessSHG()
             break;
         end
         
-        ans = inputdlg({'Filter using string','Channel Number (zero-indexed): '},...
-                       'Filter files',1,{'SHG','0'});
+        ans = inputdlg({'Filter using string','Channel Number (1-indexed): '},...
+                       'Filter files',1,{'','1'});
                   
         filter = ans{1};
-        chan = str2double(ans{2}) + 1;
+        chan = str2double(ans{2});
 
         file = [folder filesep file];
         data = bfopen(file);
@@ -24,6 +24,8 @@ function ProcessSHG()
                 name = mds{2};
                 sel(i) = ~isempty(strfind(name,filter));
             end
+        else
+            sel = true(1,size(data,1));
         end
         
         data = data(sel,:);
@@ -63,6 +65,8 @@ function ProcessSHG()
         n_z_max = max(n_z);
 
 
+        figure(2);
+        
         t = table();
         for i=1:n_im
 

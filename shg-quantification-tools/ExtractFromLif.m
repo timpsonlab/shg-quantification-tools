@@ -52,11 +52,11 @@ function ExtractFromLif(file)
     [names,idx] = sort_nat(names);
     im = im(idx);
 
-    tokens = regexp(names,'(.+)(\.\d+)', 'tokens');
+    tokens = regexp(names,'(.+)(\.\d+)(.*)', 'tokens');
     
     for i=1:n_im
         if ~isempty(tokens{i})
-            group{i} = tokens{i}{1}{1};
+            group{i} = [tokens{i}{1}{1} tokens{i}{1}{3}];
             id{i} = tokens{i}{1}{2};
         else
             group{i} = names{i};

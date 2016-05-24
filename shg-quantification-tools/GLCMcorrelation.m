@@ -1,4 +1,4 @@
-function correlation = GLCMcorrelation(im, n_step)
+function results = GLCMcorrelation(im, n_step)
 % Compute the average GLCM correlation with distance over n_step pixels 
 % at 0, 90, 180 and 270 degrees. 
 %
@@ -10,11 +10,11 @@ function correlation = GLCMcorrelation(im, n_step)
     end
     
     % Make a matrix of the offsets to evaluate
-    angle = (0:3) * pi/2;
-    step = (1:n_step)';
+    angles = [0 pi/2];
+    steps = (0:n_step)';
     
-    angle = repmat(angle, [n_step, 1]);
-    step = repmat(step, [1, 4]);
+    angle = repmat(angles, [length(steps), 1]);
+    step = repmat(steps, [1, length(angles)]);
     
     angle = angle(:);
     step = step(:);
@@ -50,8 +50,20 @@ function correlation = GLCMcorrelation(im, n_step)
     %correlation = stats.Correlation;
     %}    
     
-    % Average over angles
-    correlation = reshape(correlation, [n_step, 4]);
-    correlation = mean(correlation, 2);
+    results = struct;
+    results.correlation = correlation;
+    results.contrast = contrast;
+    results.energy = energy;
+    results.homogeneity = homogeneity;
+    
+    fields = fieldnames(results);
+    
+    for i=1:length(fields)    
+        % Average over angles
+        r = results.(fields{i});
+        r = reshape(r, [length(steps), length(angles)]);
+        r = mean(r, 2);
+        results.(fields{i}) = r;
+    end
     
 end

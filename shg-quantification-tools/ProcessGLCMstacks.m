@@ -15,15 +15,22 @@ function [avg_correlations, all_correlations, mean_correlation_distance] = Proce
 %       Mean correlation distance for each image, organised by folder
 % 
 
+    persistent last_root 
+
     % Get folder from user if it wasn't specified
     if (nargin < 1)
-        root = uigetdir();
+        if isempty(last_root)
+            last_root = '';
+        end
+        root = uigetdir(last_root);
     end
     
     if root == 0
         return
     end
 
+    last_root = root;
+    
     % Default number of steps
     n_step = 100;
     
@@ -58,14 +65,21 @@ function [avg_correlations, all_correlations, mean_correlation_distance] = Proce
     max_n_images = max(n_images);
     total_n_images = sum(n_images);
     
-    % Set up variables to populate with data
-    avg_correlations = table();
-    all_correlations = table();
-    mean_correlation_distance = table();
+    var_names = {'correlation','contrast','energy','homogeneity'};
     
-    distance = (1:n_step)';
-    avg_correlations.Distance = distance;
-    all_correlations.Distance = distance;
+    % Set up variables to populate with data
+    
+    distance = (0:n_step)';
+
+    for i=1:length(var_names)
+        avg_table{i} = table();
+        all_table{i} = table();
+        mean_table{i} = table();
+    
+        avg_table{i}.Distance = distance;
+        all_table{i}.Distance = distance;
+
+    end
     
     wh = waitbar(0, 'Processing...');
     n_images_complete = 0;
@@ -75,44 +89,55 @@ function [avg_correlations, all_correlations, mean_correlation_distance] = Proce
         % Get full file names including path
         image_files = cellfun(@(f) fullfile(folders{i}, f), image_names{i}, 'UniformOutput', false);
         
+        exclude = cellfun(@(x) x(1)=='.', image_names{i});
+        image_files = image_files(~exclude);
+        
+        
         % read in all image files
         images = cellfun(@imread, image_files, 'UniformOutput', false);
         
-        % get GLCM correlation for each image
-        correlation = zeros(n_step, length(images));
-        mean_cor = nan(max_n_images, 1);
+        % get GLCM correlation for each image        
+        for k=1:length(var_names)
+           var{k} = zeros(length(distance), length(images));
+           mean_var{k} = nan(max_n_images, 1);
+        end
         
         for j=1:length(images)
         
             disp(j)
             
-            var_name = matlab.lang.makeValidName(strrep(image_files{j},root,''));
+            name = matlab.lang.makeValidName(strrep(image_files{j},root,''));
             
             % Get normalised correlation for this image
-            cor = GLCMcorrelation(images{j}, n_step);
-            cor = cor / cor(1);
+            results = GLCMcorrelation(images{j}, n_step);
             
-            all_correlations.(var_name) = cor;
-            correlation(:,j) = cor;
-            
-            % Compute mean correlation distance
-            mean_cor(j) = sum(distance .* cor) / sum(cor);
-            
+            for k=1:length(var_names)
+                v = results.(var_names{k});
+                all_table{j}.(name) = v;
+                var{k}(:,j) = v;
+    
+                % Compute mean correlation distance
+                mean_var{k}(j) = sum(distance .* v) / sum(v);
+            end
+                        
             n_images_complete = n_images_complete + 1;
             waitbar(n_images_complete / total_n_images, wh);
         end
         
         % compute average GLCM correlation 
-        avg_correlations.(folder_var_names{i}) = mean(correlation,2);
-        mean_correlation_distance.(folder_var_names{i}) = mean_cor;
+        for k=1:length(var_names)
+            avg_table{k}.(folder_var_names{i}) = mean(var{k},2);
+            mean_table{k}.(folder_var_names{i}) = mean_var{k};
+        end
         
     end
     
     close(wh);
     
     % Save outputs
-    writetable(avg_correlations, fullfile(root, 'mean-correlations.csv'));
-    writetable(all_correlations, fullfile(root, 'all-correlations.csv'));
-    writetable(mean_correlation_distance, fullfile(root, 'mean-correlation-distances.csv'));
-        
+    for k=1:length(var_names)
+        writetable(avg_table{k}, fullfile(root, ['mean-' var_names{k} '.csv']));
+        writetable(all_table{k}, fullfile(root, ['all-' var_names{k} '.csv']));
+        writetable(mean_table{k}, fullfile(root, ['mean-' var_names{k} '-distances.csv']));
+    end
 end

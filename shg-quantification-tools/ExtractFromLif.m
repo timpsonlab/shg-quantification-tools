@@ -7,7 +7,11 @@ function ExtractFromLif(file)
         [file, folder] = uigetfile('*.lif');
         folder = [folder filesep];
     end
-
+    
+    f = inputdlg({'Filter using string'},...
+                  'Filter files',1,{'GLCM'});              
+    filter = f{1};
+        
     data = bfopen([folder file]);
 
     mkdir([folder 'Data']);
@@ -48,6 +52,15 @@ function ExtractFromLif(file)
         im{i} = im{i};
 
     end
+    
+    if ~isempty(filter)
+        sel = cellfun(@(name) ~isempty(strfind(name,filter)), names);
+        im = im(sel);
+        names = names(sel);
+    end    
+    
+    n_im = sum(sel);
+    
 %%
     [names,idx] = sort_nat(names);
     im = im(idx);

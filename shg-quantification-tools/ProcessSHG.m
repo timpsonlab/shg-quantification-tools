@@ -72,9 +72,9 @@ function ProcessSHG()
 
             z = nan(1,n_z_max);
 
-            sz = size(im{i});
-            imi = reshape(im{i},[sz(1)*sz(2), sz(3)]);
-            z(1:sz(3)) = nanmean(imi,1);
+            sz = size(im{i});            
+            imi = reshape(im{i},[sz(1)*sz(2), size(im{i},3)]);
+            z(1:size(im{i},3)) = nanmean(imi,1);
 
             name = strrep(names{i},' ','_');
             name =  matlab.lang.makeValidName(name);
@@ -89,14 +89,16 @@ function ProcessSHG()
         fields = t.Properties.VariableNames;
 
         clf
-        yy = [];
+        yy = nan(length(xx),length(fields));
 
         for i=1:length(fields)
             y = t.(fields{i}); 
             g = gradient(y);
             xmi = find(g<0,1,'first');
 
-            yy(:,i) = interp1(x,y,xx+xmi);
+            if ~isempty(xmi)
+                yy(:,i) = interp1(x,y,xx+xmi);
+            end
         end
         plot(xx,yy);
 

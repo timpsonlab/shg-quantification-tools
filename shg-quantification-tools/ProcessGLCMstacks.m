@@ -15,6 +15,8 @@ function [avg_correlations, all_correlations, mean_correlation_distance] = Proce
 %       Mean correlation distance for each image, organised by folder
 % 
 
+    reject_zero = true;
+
     persistent last_root 
 
     % Get folder from user if it wasn't specified
@@ -28,12 +30,17 @@ function [avg_correlations, all_correlations, mean_correlation_distance] = Proce
     if root == 0
         return
     end
-
+    
+    inputs = {'100','n'};
+    input_names = {'Correlation Steps', 'Ignore zeros (y/n)'};
+    answer = inputdlg(input_names,'GLCM',[1 20],inputs);
+    
+    n_step = str2double(answer{1});
+    reject_zero = strcmp(answer{2},'y');
+    
+    
     last_root = root;
-    
-    % Default number of steps
-    n_step = 100;
-    
+        
     % Acceptable image file formats
     valid_extensions = {'tif', 'tiff', 'png'};
 
@@ -103,17 +110,15 @@ function [avg_correlations, all_correlations, mean_correlation_distance] = Proce
         end
         
         for j=1:length(images)
-        
-            disp(j)
-            
-            name = matlab.lang.makeValidName(strrep(image_files{j},root,''));
+                    
+            name = matlab.lang.makeValidName(strrep(image_files{j},[root filesep],''));
             
             % Get normalised correlation for this image
-            results = GLCMcorrelation(images{j}, n_step);
+            results = GLCMcorrelation(images{j}, n_step, reject_zero);
             
             for k=1:length(var_names)
                 v = results.(var_names{k});
-                all_table{j}.(name) = v;
+                all_table{k}.(name) = v;
                 var{k}(:,j) = v;
     
                 % Compute mean correlation distance
@@ -138,6 +143,6 @@ function [avg_correlations, all_correlations, mean_correlation_distance] = Proce
     for k=1:length(var_names)
         writetable(avg_table{k}, fullfile(root, ['mean-' var_names{k} '.csv']));
         writetable(all_table{k}, fullfile(root, ['all-' var_names{k} '.csv']));
-        writetable(mean_table{k}, fullfile(root, ['mean-' var_names{k} '-distances.csv']));
+        writetable(mean_table{k}, fullfile(root, ['mean-' var_names{k} '-distances.csv']), 'WriteRowNames', true);
     end
 end

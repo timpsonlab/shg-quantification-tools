@@ -1,4 +1,4 @@
-function results = GLCMcorrelation(im, n_step)
+function results = GLCMcorrelation(im, n_step, reject_zero)
 % Compute the average GLCM correlation with distance over n_step pixels 
 % at 0, 90, 180 and 270 degrees. 
 %
@@ -7,6 +7,10 @@ function results = GLCMcorrelation(im, n_step)
 
     if nargin < 2
         n_step = 100;
+    end
+    
+    if nargin < 3
+        reject_zero = false;
     end
     
     % Make a matrix of the offsets to evaluate
@@ -40,7 +44,7 @@ function results = GLCMcorrelation(im, n_step)
     energy = zeros([1 length(offset_x)]);
     homogeneity = zeros([1 length(offset_x)]);
     for i=1:length(offset_x)
-        [correlation(i), contrast(i), energy(i), homogeneity(i)] = glcm(im, offset_x(i), offset_y(i));
+        [correlation(i), contrast(i), energy(i), homogeneity(i)] = glcm(im, offset_x(i), offset_y(i), reject_zero);
     end
     
     %{

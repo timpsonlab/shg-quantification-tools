@@ -8,12 +8,16 @@ const int n = 256;
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
+    // Compute GLCM matrix
+    // [correlation, contrast, energy, homogeneity] = glcm(im, offset_x, offset_y, reject_zero)
+    // if reject_zero is true, do not count zero pixels (allows thresholding)
+    
     // Check inputs
     if (nlhs == 0)
         return;
     
-    if (nrhs != 3)
-        mexErrMsgTxt("Should be three inputs");
+    if (nrhs < 3)
+        mexErrMsgTxt("Should be at least three inputs");
     
     if (!mxIsUint8(prhs[0]))
         mexErrMsgTxt("Intput should be a UINT8 matrix");
@@ -21,9 +25,12 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     if (mxGetNumberOfDimensions(prhs[0]) != 2)
         mexErrMsgTxt("Intput should be a 2D matrix");
 
+    bool reject_zero = false;
+    if (nrhs >= 4)
+        reject_zero = (bool) mxGetScalar(prhs[3]);
+    
     try
     {
-    
         std::vector<double> glcm(n*n);
 
         int w = mxGetN(prhs[0]);
@@ -42,14 +49,16 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
                 int xo = x + offset_x;
                 int yo = y + offset_y;
 
-
                 if ((xo >= 0) && (yo >= 0) && (xo < w) && (yo < h))
                 {
                     unsigned char a = im[x + y * w];
                     unsigned char b = im[xo + yo * w];
 
-                    glcm[a + b * n]++;
-                    n_px++;
+                    if (!reject_zero || (a & b))
+                    {                        
+                        glcm[a + b * n]++;
+                        n_px++;
+                    }
                 }
             }
         }

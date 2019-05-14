@@ -1,6 +1,6 @@
 # SHG Quantification Tools
 This code provides tools for quantification of second harmonic generation (SHG) images. 
-
+Now uses Matlab 2016b runtime
 
 
 ## Running the code

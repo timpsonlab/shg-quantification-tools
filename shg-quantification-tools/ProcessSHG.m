@@ -18,11 +18,11 @@ function ProcessSHG()
         data = bfopen(file);
         
         if ~isempty(filter)
-            for i=1:size(data,1);
+            for i=1:size(data,1)
                 md = data{i,1}{1,2};
                 mds = strsplit(md, '; ');
                 name = mds{2};
-                sel(i) = ~isempty(strfind(name,filter));
+                sel(i) = contains(name,filter);
             end
         else
             sel = true(1,size(data,1));
@@ -36,6 +36,8 @@ function ProcessSHG()
         im = cell(1,n_im);
         names = cell(1,n_im);
 
+        h = waitbar(0,'Processing...');
+        
         for i=1:n_im
 
             md = data{i,1}{1,2};
@@ -55,7 +57,8 @@ function ProcessSHG()
             for j=1:n_slice
                 im{i}(:,:,j) = datai{(j-1)*n_chan+chan, 1};
             end
-
+            
+            waitbar(i/(n_im*2),h);
         end
         
         [names,idx] = sort_nat(names);
@@ -81,6 +84,8 @@ function ProcessSHG()
             t.(name) = z';
             plot(z)
             hold on
+
+            waitbar((i+n_im)/(n_im*2),h);
         end
 
         x = 1:n_z_max;
@@ -118,5 +123,7 @@ function ProcessSHG()
 
         outfile = strrep(file,'.lif','-z-profile-aligned.csv');
         writetable(ta, outfile);
+        
+        close(h);
     end
 end

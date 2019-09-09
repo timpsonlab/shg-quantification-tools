@@ -1,0 +1,3 @@
+[submodule "shg-quantification-tools/matlab-ui-common"]
+	path = shg-quantification-tools/matlab-ui-common
+	url = https://github.com/flimfit/matlab-ui-common

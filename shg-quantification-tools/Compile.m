@@ -1,4 +1,19 @@
+    
 function Compile
+
+    % Build GLCM MEX file
+    mex glcm.cpp 'CXXFLAGS="$CXXFLAGS -O3"'
+
+    addpath('matlab-ui-common');
+
+    get_bioformats();
+    get_gui_layout_toolbox();
+
+    compile_function('Interface.m','SHG_QuantificationTools',{'matlab-ui-common'});
+    
+end
+
+function Compilex
     
     % Build GLCM MEX file
     mex glcm.cpp 'CXXFLAGS="$CXXFLAGS -O3"'

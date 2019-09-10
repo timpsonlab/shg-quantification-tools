@@ -1,7 +1,8 @@
 function Interface()
 
-    GetBioformats();
-
+    get_bioformats();
+    get_gui_layout_toolbox();
+    
     fh = figure('ToolBar','none','Name','SHG Processing','NumberTitle','off','MenuBar','none');
     
     pos = get(fh,'Position');
